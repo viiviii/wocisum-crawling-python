@@ -131,3 +131,7 @@ dmypy.json
 
 # My private file
 private_constant.py
+
+# My etc file
+FiddlerRoot.pem
+.idea/
