@@ -30,9 +30,11 @@ values = [dd.text for dd in soup.select('.lst_copy_info dd')]
 copy_info = dict(zip(keys, values))
 copy_info.update({'crawling_dttm': datetime.now().strftime('%Y-%m-%d')})
 
+recent_5years_royalties = re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', html).group('royalty')
 print(id)
 print(title)
 print(artist)
 print(detail)
 print(auction_id)
 print(copy_info)
+print(recent_5years_royalties)
