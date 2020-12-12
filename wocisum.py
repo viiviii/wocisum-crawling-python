@@ -1,9 +1,11 @@
+import json
 import re
 import requests
+import private_constant
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-import private_constant
+
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
@@ -31,10 +33,21 @@ copy_info = dict(zip(keys, values))
 copy_info.update({'crawling_dttm': datetime.now().strftime('%Y-%m-%d')})
 
 recent_5years_royalties = re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', html).group('royalty')
+
+year = '2020'
+month = '11'
+month_royalty = json.loads(recent_5years_royalties)[year][month]
+
+recent_12months_royalty_keys = [key.text[:2] for key in soup.select('.tbl_flex dt')]
+recent_12months_royalty_values = [key.text for key in soup.select('.tbl_flex dd')]
+recent_12months_royalties = dict(zip(recent_12months_royalty_keys, recent_12months_royalty_values))
+recent_12months_royalty_total = soup.find('dt', text='최근 12개월 저작권료 (1주 기준)').find_next_sibling('dd').text
+
 print(id)
 print(title)
 print(artist)
 print(detail)
 print(auction_id)
 print(copy_info)
-print(recent_5years_royalties)
+print(recent_12months_royalties)
+print(recent_12months_royalty_total)
