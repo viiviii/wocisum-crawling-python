@@ -1,11 +1,11 @@
 import json
 import re
-import requests
-import private_constant
 from datetime import datetime
+
+import requests
 from bs4 import BeautifulSoup
 
-
+import private_constant
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
@@ -21,33 +21,60 @@ res = requests.get(private_constant.target.replace('$song_id', id),
 html = res.text
 soup = BeautifulSoup(html, 'html.parser')
 
-info = soup.find(class_='information')
-title = info.find(class_='title').strong.get_text()
-artist = info.find(class_='artist').get_text()
-detail = soup.find(class_='detail_txt').get_text()
-auction_id = re.search(r'/auction/(?P<id>[0-9]+)', html).group('id')
 
-keys = [dt.text for dt in soup.select('.lst_copy_info dt')]
-values = [dd.text for dd in soup.select('.lst_copy_info dd')]
-copy_info = dict(zip(keys, values))
-copy_info.update({'crawling_dttm': datetime.now().strftime('%Y-%m-%d')})
+def title():
+    return soup.select_one('.information .title strong').text
 
-recent_5years_royalties = re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', html).group('royalty')
 
-year = '2020'
-month = '11'
-month_royalty = json.loads(recent_5years_royalties)[year][month]
+def artist():
+    return soup.select_one('.information .artist').text
 
-recent_12months_royalty_keys = [key.text[:2] for key in soup.select('.tbl_flex dt')]
-recent_12months_royalty_values = [key.text for key in soup.select('.tbl_flex dd')]
-recent_12months_royalties = dict(zip(recent_12months_royalty_keys, recent_12months_royalty_values))
-recent_12months_royalty_total = soup.find('dt', text='최근 12개월 저작권료 (1주 기준)').find_next_sibling('dd').text
 
-print(id)
-print(title)
-print(artist)
-print(detail)
-print(auction_id)
-print(copy_info)
-print(recent_12months_royalties)
-print(recent_12months_royalty_total)
+def detail():
+    return soup.find(class_='detail_txt').text
+
+
+def auction_id():
+    return re.search(r'/auction/(?P<id>[0-9]+)', html).group('id')
+
+
+def copy_info():
+    target = soup.find(class_='lst_copy_info')
+    keys = [dt.text for dt in target.find_all('dt')]
+    values = [dd.text for dd in target.find_all('dd')]
+    output = dict(zip(keys, values))
+    output.update({'crawling_dttm': datetime.now().strftime('%Y-%m-%d')})
+    return output
+
+
+def recent_5years_royalties():
+    return re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', html).group('royalty')
+
+
+def recent_month_royalty(year, month):
+    now = datetime.now()
+    assert now.year - 5 < year <= now.year, f'The value must be within 5 years. actual: {year}'
+    assert 0 < month < now.month, f'The value must be before last month. actual: {month}'
+    royalties = recent_5years_royalties()
+    return json.loads(royalties)[str(year)][str(month)]
+
+
+def recent_12months_royalties():
+    target = soup.find(class_='tbl_flex')
+    keys = [dt.text[:2] for dt in target.find_all('dt')]
+    values = [dd.text for dd in target.find_all('dt')]
+    return dict(zip(keys, values))
+
+
+def recent_12months_royalty_total():
+    return soup.find('dt', text='최근 12개월 저작권료 (1주 기준)').find_next_sibling('dd').text
+
+
+print(title())
+print(artist())
+print(detail())
+print(auction_id())
+print(copy_info())
+print(recent_month_royalty(year=2020, month=11))
+print(recent_12months_royalties())
+print(recent_12months_royalty_total())
