@@ -57,9 +57,6 @@ class Song:
         return re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', self.html).group('royalty')
 
     @staticmethod
-    # TODO
-    def recent_month_royalty(year, month, royalties):
+    def recent_month_royalty(royalties):
         now = datetime.now()
-        assert now.year - 5 < year <= now.year, f'The value must be within 5 years. actual: {year}'
-        assert 0 < month < now.month, f'The value must be before last month. actual: {month}'
-        return json.loads(royalties)[str(year)][str(month)]
+        return json.loads(royalties)[str(now.year)][str(now.month-1)]
