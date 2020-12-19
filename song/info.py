@@ -60,3 +60,13 @@ class Song:
     def recent_month_royalty(royalties):
         now = datetime.now()
         return json.loads(royalties)[str(now.year)][str(now.month-1)]
+
+    def auction_info(self):
+        # TODO There may be more than one information
+        auction = self.soup.find(class_='lst_numb_card')
+        auction_info = {'title': auction.h2.text.strip()}
+        keys = [dt.text for dt in auction.find_all('dt')]
+        values = [dd.text for dd in auction.find_all('dd')]
+        auction_content = dict(zip(keys, values))
+        auction_info.update(auction_content)
+        return [auction_info]
