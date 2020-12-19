@@ -47,7 +47,7 @@ class Song:
     def recent_12months_royalties(self):
         target = self.soup.find(class_='tbl_flex')
         keys = [dt.text[:2] for dt in target.find_all('dt')]
-        values = [dd.text for dd in target.find_all('dt')]
+        values = [dd.text for dd in target.find_all('dd')]
         return dict(zip(keys, values))
 
     def recent_12months_royalty_total(self):
