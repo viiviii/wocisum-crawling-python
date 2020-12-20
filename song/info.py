@@ -44,16 +44,16 @@ class Song:
         output.update({'crawling_dttm': datetime.now().strftime('%Y-%m-%d')})
         return output
 
-    def recent_12months_royalties(self):
+    def detail_royalty_recent_12months(self):
         target = self.soup.find(class_='tbl_flex')
         keys = [dt.text[:2] for dt in target.find_all('dt')]
         values = [dd.text for dd in target.find_all('dd')]
         return dict(zip(keys, values))
 
-    def recent_12months_royalty_total(self):
+    def total_royalty_recent_12months(self):
         return self.soup.find('dt', text='최근 12개월 저작권료 (1주 기준)').find_next_sibling('dd').text
 
-    def recent_5years_royalties(self):
+    def monthly_royalty_recent_5years(self):
         return re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', self.html).group('royalty')
 
     @staticmethod
