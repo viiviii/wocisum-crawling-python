@@ -69,7 +69,8 @@ class Song:
 
     def to_song(self):
         return (self.id, self.auction_id(), self.title(), self.artist(),
-                self.detail(), json.dumps(self.copy_info()), json.dumps(self.auction_info()), datetime.now())
+                self.detail(), json.dumps(self.copy_info(), ensure_ascii=False),
+                json.dumps(self.auction_info(), ensure_ascii=False), datetime.now())
 
     def to_recent_detail_royalty(self):
         detail_royalty = self.detail_royalty_recent_12months()
