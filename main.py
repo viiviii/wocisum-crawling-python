@@ -20,16 +20,25 @@ while song_id < 27:
     cur.execute(song_sql, song_data)
     print(f'-- song_data: {song_data}')
 
-    royalty_sql = 'insert into t_royalty values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-    royalty_data = song.to_recent_detail_royalty()
-    cur.execute(royalty_sql, royalty_data)
-    print(f'-- royalty_data: {royalty_data}')
+    monthly_royalties_sql = 'insert into t_royalty (song_id, calculate_dt, month_royalty) values(%s, %s, %s)'
+    monthly_royalties_data = song.to_monthly_royalties()
+    for data in monthly_royalties_data:
+        cur.execute(monthly_royalties_sql, data)
+    print(f'-- monthly_royalty_data: {monthly_royalties_data}')
 
-    monthly_royalty_sql = 'insert into t_royalty (song_id, calculate_dt, month_royalty) values(%s, %s, %s)'
-    monthly_royalty_data = song.to_monthly_royalties()
-    for data in monthly_royalty_data:
-        cur.execute(monthly_royalty_sql, data)
-    print(f'-- monthly_royalty_data: {monthly_royalty_data}')
+    # recent_detail_royalty_sql = 'insert into t_royalty values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+    # recent_detail_royalty_data = song.to_recent_detail_royalty()
+    # cur.execute(recent_detail_royalty_sql, recent_detail_royalty_data)
+    # print(f'-- royalty_data: {recent_detail_royalty_data}')
+
+    recent_detail_royalty_sql = '''update t_royalty
+    set recent_12month_royalty = %s, broadcasting = %s, send = %s, duplication = %s, concert = %s, overseas = %s, etc = %s
+    where song_id = %s and calculate_dt = %s'''
+    recent_detail_royalty_data = song.to_recent_detail_royalty()
+    set_value = recent_detail_royalty_data[3:10]
+    where_value = recent_detail_royalty_data[:2]
+    cur.execute(recent_detail_royalty_sql, set_value+where_value)
+    print(f'-- recent_detail_royalty_data: {set_value+where_value}')
 
     print(f'end song_id: {song_id}')
     song_id += 1
