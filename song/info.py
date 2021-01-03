@@ -76,7 +76,7 @@ class Song:
         monthly_royalty = json.loads(self.monthly_royalty_recent_5years())
         year = max(monthly_royalty.keys())
         month = max(monthly_royalty[year].keys())
-        return (self.id, f'{year}-{year}-01',
+        return (self.id, f'{year}-{month}-01',
                 monthly_royalty[year][month], self.total_royalty_recent_12months(),
                 detail_royalty['방송'], detail_royalty['전송'], detail_royalty['복제'], detail_royalty['공연'],
                 detail_royalty['해외'], detail_royalty['기타'],  datetime.now())
