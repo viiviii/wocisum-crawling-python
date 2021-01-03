@@ -57,14 +57,6 @@ class Song:
     def monthly_royalty_recent_5years(self):
         return re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', self.html).group('royalty')
 
-    @staticmethod
-    def recent_month_royalty(royalties):
-        now = datetime.now()
-        monthly_royalty = json.loads(royalties)
-        if now.month == 1:
-            return monthly_royalty[str(now.year-1)]["12"]
-        return monthly_royalty[str(now.year)][str(now.month-1)]
-
     def auction_info(self):
         # TODO There may be more than one information
         auction = self.soup.find(class_='lst_numb_card')
@@ -80,10 +72,12 @@ class Song:
                 self.detail(), json.dumps(self.copy_info()), json.dumps(self.auction_info()), datetime.now())
 
     def to_recent_royalty_list(self):
-        monthly_royalty = self.monthly_royalty_recent_5years()
         detail_royalty = self.detail_royalty_recent_12months()
-        return (self.id, datetime.today().strftime('%Y-%m-01'),
-                self.recent_month_royalty(monthly_royalty), self.total_royalty_recent_12months(),
+        monthly_royalty_list = json.loads(self.monthly_royalty_recent_5years())
+        year = max(monthly_royalty_list.keys())
+        month = max(monthly_royalty_list[year].keys())
+        return (self.id, f'{year}-{month}-01',
+                monthly_royalty_list[year][month], self.total_royalty_recent_12months(),
                 detail_royalty['방송'], detail_royalty['전송'], detail_royalty['복제'], detail_royalty['공연'],
                 detail_royalty['해외'], detail_royalty['기타'],  datetime.now())
 
