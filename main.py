@@ -25,6 +25,12 @@ while song_id < 27:
     cur.execute(royalty_sql, royalty_data)
     print(f'-- royalty_data: {royalty_data}')
 
+    monthly_royalty_sql = 'insert into t_royalty (song_id, calculate_dt, month_royalty) values(%s, %s, %s)'
+    monthly_royalty_data = song.to_monthly_royalty_list()
+    for data in monthly_royalty_data:
+        cur.execute(monthly_royalty_sql, data)
+    print(f'-- monthly_royalty_data: {monthly_royalty_data}')
+
     print(f'end song_id: {song_id}')
     song_id += 1
 

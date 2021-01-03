@@ -81,12 +81,16 @@ class Song:
 
     def to_recent_royalty_list(self):
         monthly_royalty = self.monthly_royalty_recent_5years()
-        print(monthly_royalty)
         detail_royalty = self.detail_royalty_recent_12months()
         return (self.id, datetime.today().strftime('%Y-%m-01'),
                 self.recent_month_royalty(monthly_royalty), self.total_royalty_recent_12months(),
                 detail_royalty['방송'], detail_royalty['전송'], detail_royalty['복제'], detail_royalty['공연'],
                 detail_royalty['해외'], detail_royalty['기타'],  datetime.now())
+
+    def to_monthly_royalty_list(self):
+        monthly_royalty = json.loads(self.monthly_royalty_recent_5years())
+        return [(self.id, f'{year}-{month}-01', value)
+                for year, month_list in monthly_royalty.items() for month, value in month_list.items()]
 
 
 def only_amount(text):
