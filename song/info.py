@@ -47,11 +47,12 @@ class Song:
     def detail_royalty_recent_12months(self):
         target = self.soup.find(class_='tbl_flex')
         keys = [dt.text[:2] for dt in target.find_all('dt')]
-        values = [dd.text for dd in target.find_all('dd')]
+        values = [only_amount(dd.text) for dd in target.find_all('dd')]
         return dict(zip(keys, values))
 
     def total_royalty_recent_12months(self):
-        return self.soup.find('dt', text='최근 12개월 저작권료 (1주 기준)').find_next_sibling('dd').text
+        total_amount_text = self.soup.find('dt', text='최근 12개월 저작권료 (1주 기준)').find_next_sibling('dd').text
+        return only_amount(total_amount_text)
 
     def monthly_royalty_recent_5years(self):
         return re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', self.html).group('royalty')
@@ -70,3 +71,20 @@ class Song:
         auction_content = dict(zip(keys, values))
         auction_info.update(auction_content)
         return [auction_info]
+
+    def to_song_list(self):
+        return (self.id, self.auction_id(), self.title(), self.artist(),
+                self.detail(), json.dumps(self.copy_info()), json.dumps(self.auction_info()), datetime.now())
+
+    def to_royalty_list(self):
+        monthly_royalty = self.monthly_royalty_recent_5years()
+        print(monthly_royalty)
+        detail_royalty = self.detail_royalty_recent_12months()
+        return (self.id, datetime.today().strftime('%Y-%m-01'),
+                self.recent_month_royalty(monthly_royalty), self.total_royalty_recent_12months(),
+                detail_royalty['방송'], detail_royalty['전송'], detail_royalty['복제'], detail_royalty['공연'],
+                detail_royalty['해외'], detail_royalty['기타'],  datetime.now())
+
+
+def only_amount(text):
+    return re.search(r'(?P<price>\d+)원', text).group('price')
