@@ -58,14 +58,13 @@ class Song:
         return re.search(r'arr_amt_royalty_ym\[.+\] ?= ?(?P<royalty>{.+})', self.html).group('royalty')
 
     def auction_info(self):
-        # TODO There may be more than one information
-        auction = self.soup.find(class_='lst_numb_card')
-        auction_info = {'title': auction.h2.text.strip()}
-        keys = [dt.text for dt in auction.find_all('dt')]
-        values = [dd.text for dd in auction.find_all('dd')]
-        auction_content = dict(zip(keys, values))
-        auction_info.update(auction_content)
-        return [auction_info]
+        auctions = self.soup.find_all(class_='lst_numb_card')
+        result = []
+        for auction in auctions:
+            keys = [dt.text for dt in auction.find_all('dt')]
+            values = [dd.text for dd in auction.find_all('dd')]
+            result.append({'title': auction.h2.text.strip(), **dict(zip(keys, values))})
+        return result
 
     def to_song(self):
         return (self.id, self.auction_id(), self.title(), self.artist(),
