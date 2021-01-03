@@ -67,24 +67,24 @@ class Song:
         auction_info.update(auction_content)
         return [auction_info]
 
-    def to_song_list(self):
+    def to_song(self):
         return (self.id, self.auction_id(), self.title(), self.artist(),
                 self.detail(), json.dumps(self.copy_info()), json.dumps(self.auction_info()), datetime.now())
 
-    def to_recent_royalty_list(self):
+    def to_recent_detail_royalty(self):
         detail_royalty = self.detail_royalty_recent_12months()
-        monthly_royalty_list = json.loads(self.monthly_royalty_recent_5years())
-        year = max(monthly_royalty_list.keys())
-        month = max(monthly_royalty_list[year].keys())
-        return (self.id, f'{year}-{month}-01',
-                monthly_royalty_list[year][month], self.total_royalty_recent_12months(),
+        monthly_royalty = json.loads(self.monthly_royalty_recent_5years())
+        year = max(monthly_royalty.keys())
+        month = max(monthly_royalty[year].keys())
+        return (self.id, f'{year}-{year}-01',
+                monthly_royalty[year][month], self.total_royalty_recent_12months(),
                 detail_royalty['방송'], detail_royalty['전송'], detail_royalty['복제'], detail_royalty['공연'],
                 detail_royalty['해외'], detail_royalty['기타'],  datetime.now())
 
-    def to_monthly_royalty_list(self):
+    def to_monthly_royalties(self):
         monthly_royalty = json.loads(self.monthly_royalty_recent_5years())
         return [(self.id, f'{year}-{month}-01', value)
-                for year, month_list in monthly_royalty.items() for month, value in month_list.items()]
+                for year, months in monthly_royalty.items() for month, value in months.items()]
 
 
 def only_amount(text):

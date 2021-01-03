@@ -16,17 +16,17 @@ while song_id < 27:
         continue
 
     song_sql = 'insert into t_song values (%s, %s, %s, %s, %s, %s, %s, %s);'
-    song_data = song.to_song_list()
+    song_data = song.to_song()
     cur.execute(song_sql, song_data)
     print(f'-- song_data: {song_data}')
 
     royalty_sql = 'insert into t_royalty values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-    royalty_data = song.to_recent_royalty_list()
+    royalty_data = song.to_recent_detail_royalty()
     cur.execute(royalty_sql, royalty_data)
     print(f'-- royalty_data: {royalty_data}')
 
     monthly_royalty_sql = 'insert into t_royalty (song_id, calculate_dt, month_royalty) values(%s, %s, %s)'
-    monthly_royalty_data = song.to_monthly_royalty_list()
+    monthly_royalty_data = song.to_monthly_royalties()
     for data in monthly_royalty_data:
         cur.execute(monthly_royalty_sql, data)
     print(f'-- monthly_royalty_data: {monthly_royalty_data}')
