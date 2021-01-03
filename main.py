@@ -21,7 +21,7 @@ while song_id < 27:
     print(f'-- song_data: {song_data}')
 
     royalty_sql = 'insert into t_royalty values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-    royalty_data = song.to_royalty_list()
+    royalty_data = song.to_recent_royalty_list()
     cur.execute(royalty_sql, royalty_data)
     print(f'-- royalty_data: {royalty_data}')
 

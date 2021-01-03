@@ -60,7 +60,10 @@ class Song:
     @staticmethod
     def recent_month_royalty(royalties):
         now = datetime.now()
-        return json.loads(royalties)[str(now.year)][str(now.month-1)]
+        monthly_royalty = json.loads(royalties)
+        if now.month == 1:
+            return monthly_royalty[str(now.year-1)]["12"]
+        return monthly_royalty[str(now.year)][str(now.month-1)]
 
     def auction_info(self):
         # TODO There may be more than one information
@@ -76,7 +79,7 @@ class Song:
         return (self.id, self.auction_id(), self.title(), self.artist(),
                 self.detail(), json.dumps(self.copy_info()), json.dumps(self.auction_info()), datetime.now())
 
-    def to_royalty_list(self):
+    def to_recent_royalty_list(self):
         monthly_royalty = self.monthly_royalty_recent_5years()
         print(monthly_royalty)
         detail_royalty = self.detail_royalty_recent_12months()
